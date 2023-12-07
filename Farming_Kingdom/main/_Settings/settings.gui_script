@@ -1,0 +1,52 @@
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	volume = 100
+	volume_btn = gui.get_node("Volume_percentage")
+	sound_effects_btn = gui.get_node("Sound_effects")
+	sound_effects = true
+end
+
+function final(self)
+	msg.post(".", "release_input_focus")
+end
+
+function on_input(self, action_id, action)
+	if action.pressed then
+		if gui.pick_node(gui.get_node("Return"), action.x, action.y) then
+			-- Sends the message to load the title screen --
+			msg.post("main:/controller", "title")
+			
+		end
+		if gui.pick_node(gui.get_node("Audio_down"), action.x, action.y) then
+			-- Checks whether the volume is at min -- 
+			if volume > 0 then
+				-- Decreases the dislayed percentage -- 
+				volume = volume - 10
+				volume_percentage = volume .. "%"
+				gui.set_text(volume_btn, volume_percentage)
+			end
+		end
+		if gui.pick_node(gui.get_node("Audio_up"), action.x, action.y) then
+			--Checks whether the volume is at max -- 
+			if volume < 100 then
+				-- Increases the dislayed percentage -- 
+				volume = volume + 10
+				volume_percentage = volume .. "%"
+				gui.set_text(volume_btn, volume_percentage)
+			end
+		end
+		if gui.pick_node(gui.get_node("Sound_effects"), action.x, action.y) then
+			-- Checks if the soundeffects are toggled on -- 
+			if sound_effects == true then
+				-- Toggles the sound effects off -- 
+				gui.play_flipbook(sound_effects_btn, "off_btn")
+				sound_effects = false
+			else 
+				-- Toggles the sound effects on -- 
+				gui.play_flipbook(sound_effects_btn, "on_btn")
+				sound_effects = true
+			end
+		end
+	end
+end

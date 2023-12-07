@@ -1,0 +1,135 @@
+
+function init(self)
+	base_harvest = 50   -- Stores the default (no modifers) amount of progress per click
+	
+	-- Initialises the GUI to display correct values --  
+	msg.post("main_game:/GUI", "update_food", {food = food_info["number"][current_food], storage = max_storage})
+	msg.post("main_game:/GUI", "update_crop", {crops = crop_info["number"][current_crop], storage = max_storage})
+	bar_fill = completed_cook * 2
+	msg.post("main_game:/GUI", "update_food_progress", {size = bar_fill})
+	bar_fill = completed_farm * 2
+	msg.post("main_game:/GUI", "update_crop_progress", {size = bar_fill})
+end
+
+local function cook_harvest()
+	local is_new_food    = false -- Stores whether a new food is crafted
+	local food_number    = food_info["number"][current_food]
+	local completion_amt = food_info["completion_req"][current_food]
+	
+	completed_cook = completed_cook + (base_harvest) -- modifers to be added later
+	-- Checks if max progression is reached -- 
+	if completed_cook >= completion_amt then
+		-- Checks if the selected food is maxed --
+		if not(food_number >= max_storage) then
+			-- Adds a new food to the storage --  
+			food_number = food_number + (1)
+			food_info["number"][current_food] = food_number
+			-- Updates GUI display
+			msg.post("main_game:/GUI", "update_food", {food = food_number, storage = max_storage})
+			is_new_food = true
+		end
+		-- Resets the completion value -- 
+		completed_cook = 0
+	end
+	local max_bar_size = 200
+	-- Calculates the fill of the progress bar -- 
+	bar_fill = completed_cook * (max_bar_size / completion_amt)
+
+	-- Updates the progress bar fill --
+	msg.post("main_game:/GUI", "update_food_progress", {size = bar_fill})
+	return is_new_food
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("farm_click") then
+		local crop_number = crop_info["number"][current_crop]
+		local completion_amt = crop_info["completion_req"][current_crop]
+		-- Adds the progress per click to overall progress --
+		completed_farm = completed_farm + (base_harvest * evt_harvesting_mod) -- modifers to be added later
+		-- Checks if max progression is reached -- 
+		if completed_farm >= completion_amt then
+			-- Checks if the selected crop is maxed --
+			if not(crop_number >= max_storage) then
+				-- Adds a new crop to the storage --  
+				crop_number = crop_number + (1 * evt_increase_mod)
+				crop_info["number"][current_crop] = crop_number
+				-- Updates GUI display
+				msg.post("main_game:/GUI", "update_crop", {crops = crop_number, storage = max_storage})
+			end
+			-- Resets the completion value -- 
+			completed_farm = 0
+		end
+		
+		local max_bar_size = 200
+		-- Calculates the fill of the progress bar -- 
+		bar_fill = completed_farm * (max_bar_size / completion_amt)
+		
+		-- Updates the progress bar fill --
+		msg.post("main_game:/GUI", "update_crop_progress", {size = bar_fill})
+		
+	elseif message_id == hash("cook_click") then
+		
+		local available_qty_one   = crop_info["number"][food_info["1st_req_type"][current_food]]
+		local req_qty_one         = food_info["1st_req_qty"][current_food]
+		local available_qty_two   = crop_info["number"][food_info["2nd_req_type"][current_food]]
+		local req_qty_two         = food_info["2nd_req_qty"][current_food]
+		local available_qty_three = crop_info["number"][food_info["3rd_req_type"][current_food]]
+		local req_qty_three       = food_info["3rd_req_qty"][current_food]
+		
+		-- Checks if enough crops are stored to meet the first requirement -- 
+		if available_qty_one >= req_qty_one then
+			
+			-- Checks if there is a second requirement -- 
+			if food_info["2nd_req_type"][current_food] == 0 then
+				
+				------------------------------- 1 Requirement ------------------------------------------------------------------
+				local is_food_crafted = cook_harvest() -- Handles the completion requirements 
+				
+				-- Subtracts the crop requirements if a successful craft is done -- 
+				if is_food_crafted == true then 
+					crop_info["number"][food_info["1st_req_type"][current_food]] = available_qty_one - req_qty_one 
+
+					-- Updates the displayed crops to reflect the subtraction -- 
+					msg.post("main_game:/GUI", "update_crop", {crops = crop_info["number"][current_crop], storage = max_storage})
+				end
+				-------------------------------------------------------------------------------------------------------------
+				
+		-- Checks if enough crops are stored to meet the second requirement -- 
+		elseif available_qty_two >= req_qty_two then
+			
+				-- Checks if there isn't a third requirement -- 
+				if food_info["3rd_req_type"][current_food] == 0 then
+					
+					------------------------------- 2 Requirements -------------------------------------------------------------
+					local is_food_crafted = cook_harvest() -- Handles the completion requirements
+					
+					-- Subtracts the crop requirements if a successful craft is done -- 
+					if is_food_crafted == true then 
+						crop_info["number"][food_info["1st_req_type"][current_food]] = available_qty_one - req_qty_one 
+						crop_info["number"][food_info["2nd_req_type"][current_food]] = available_qty_two - req_qty_two 
+						-- Updates the displayed crops to reflect the subtraction -- 
+						msg.post("main_game:/GUI", "update_crop", {crops = crop_info["number"][current_crop], storage = max_storage})
+					end
+					-------------------------------------------------------------------------------------------------------------
+
+					-- Checks if enough crops are stored to meet the third requirement -- 
+			elseif available_qty_three >= req_qty_three then
+				
+					------------------------------- 3 Requirements -------------------------------------------------------------
+					
+					-- Handles the completion requirements --
+					local is_food_crafted = cook_harvest()
+					-- Subtracts the crop requirements if a successful craft is done -- 
+					if is_food_crafted == true then 
+						crop_info["number"][food_info["1st_req_type"][current_food]] = available_qty_one   - req_qty_one 
+						crop_info["number"][food_info["2nd_req_type"][current_food]] = available_qty_two   - req_qty_two 
+						crop_info["number"][food_info["3rd_req_type"][current_food]] = available_qty_three - req_qty_three 
+						-- Updates the displayed crops to reflect the subtraction -- 
+						msg.post("main_game:/GUI", "update_crops", {crops = crop_info["number"][current_crop], storage = max_storage})
+					end	
+					-------------------------------------------------------------------------------------------------------------
+				end
+			end
+		end
+	end
+end

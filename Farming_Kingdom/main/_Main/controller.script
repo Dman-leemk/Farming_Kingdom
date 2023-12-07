@@ -1,0 +1,62 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	-- shows the title screen when the game is loaded --
+	msg.post("#title_screen", "load")
+	self.current_collection = "#title_screen"	
+end
+
+function final(self)
+	msg.post(".", "release_input_focus")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("proxy_loaded") then
+		-- loads the correct collection when a message is received --
+		msg.post(sender, "enable")
+
+	-- sets the collection to load when a message is received --
+	elseif message_id == hash("title") then
+		-- sets the title screen -- 
+		msg.post(self.current_collection, "unload")
+		msg.post("#title_screen", "load")
+		self.current_collection = "#title_screen"
+		
+	elseif message_id == hash("diff") then
+		-- sets the difficulty screen -- 
+		msg.post(self.current_collection, "unload")
+		msg.post("#difficulty_menu", "load")
+		self.current_collection = "#difficulty_menu"
+		
+	elseif message_id == hash("setting") then
+		-- sets the settings screen --
+		msg.post(self.current_collection, "unload")
+		msg.post("#settings", "load")
+		self.current_collection = "#settings"
+		 
+	elseif message_id == hash("main") then
+		-- sets the main game screen -- 
+		
+		msg.post(self.current_collection, "unload")
+		msg.post("#main_game", "load")
+		self.current_collection = "#main_game"
+		
+	elseif message_id == hash("farm") then
+		-- sets the farm missions screen -- 
+		msg.post(self.current_collection, "unload")
+		msg.post("#farm_missions", "load")
+		self.current_collection = "#farm_missions"
+		
+	elseif message_id == hash("pause") then
+		-- sets the pause screen -- 
+		msg.post(self.current_collection, "unload")
+		msg.post("#pause_menu", "load")
+		self.current_collection = "#pause_menu"
+		
+	elseif message_id == hash("end") then
+		-- sets the end game screen -- 
+		msg.post(self.current_collection, "unload")
+		msg.post("#end_game", "load")
+		self.current_collection = "#end_game"
+		
+	end
+end

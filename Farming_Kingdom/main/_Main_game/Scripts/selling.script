@@ -1,0 +1,35 @@
+
+function init(self)
+	-- Updates the displayed number to match the stored value --
+	msg.post("main_game:/GUI", "update_bank", {bank = bank})
+	msg.post("main_game:/GUI_selection_boxes", "update_cash", 
+	{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("sell_click") then
+		-- Stores the number of food selected
+		local number_food = food_info["number"][current_food]
+		local remaining_percent = 1 - tax_percent -- Stores the amount of money left post tax
+		
+		-- Checks if there is enough food stored --
+		if number_food >= selling_amount then
+			-- Increases the banked number based on the value of the stored crop -- 
+			bank = bank + math.ceil((remaining_percent * (food_info["value"][current_food])))
+			-- Decreases the number of stored crops to correspond to the sold crops -- 
+			number_food = number_food - selling_amount
+			-- Stores the change in global memory
+			food_info["number"][current_food] = number_food
+			
+			-- Used to update completion requirements --
+			msg.post("main_game:/Time_dependant_scripts#level" , "Food_sold", {foodtype = current_food})
+			
+			-- Updates the GUI to match the changes -----------------------------------------------
+			msg.post("main_game:/GUI", "update_food", {food = number_food, storage = max_storage})
+			msg.post("main_game:/GUI", "update_bank", {bank = bank})
+			msg.post("main_game:/GUI_selection_boxes", "update_cash", 
+			{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
+			---------------------------------------------------------------------------------------
+		end
+	end
+end

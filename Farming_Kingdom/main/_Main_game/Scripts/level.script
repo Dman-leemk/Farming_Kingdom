@@ -1,0 +1,99 @@
+require("main.table_reading") 
+
+local level_count = 30
+
+function init(self)
+	
+	msg.post(".", "acquire_input_focus")
+	
+	msg.post("main_game:/GUI", "update_level", {lvl = current_lvl})
+end
+
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("Food_sold") then
+		local num_req = 3 -- Stores the number of requirements
+		-- Stores the table indexes --
+		local req_type_index = {"1st_requirement_type","2nd_requirement_type","3rd_requirement_type"}
+		local req_qty_index  = {"1st_requirement_qty","2nd_requirement_qty","3rd_requirement_qty"}
+		-- Iterates through every requirement --
+		for req_num = 1, num_req do
+			-- Checks if the message relates to the current requirement -- 
+			if message.foodtype == table_ctrl.get_lvl(req_type_index[req_num]) then
+				-- Stores the global table value --
+				requirement_qty = table_ctrl.get_lvl(req_qty_index[req_num])
+				-- Changes the requirements based on the sold crops --
+				requirement_qty = requirement_qty - selling_amount
+				-- Changes the global table to reflect the changes --
+				table_ctrl.set_lvl(req_qty_index[req_num], requirement_qty)
+				msg.post("main_game:/GUI", "update_module",{index = req_qty_index[req_num], value = requirement_qty})
+				msg.post("main_game:/GUI", "update_level", {lvl = current_lvl})
+				
+				-- Checks if the requirement is completed --
+				if requirement_qty == 0 then
+					-- Sets the first requirement --
+					lvl_completion[req_num] = true
+					-- Checks if the level is completed --
+					if (lvl_completion[1] == true) and (lvl_completion[2] == true) and (lvl_completion[3] == true) then
+						-- Sets the next level --
+						msg.post("#", "New_level")
+					end
+				end
+			end
+		end
+	elseif message_id == hash("New_level") then
+		local num_req = 3 -- Stores the number of requirements
+		-- Increments the level --
+		current_lvl = current_lvl + 1
+		
+		msg.post("#", "Unlock")
+		
+		-- Checks is all levels are compeleted --
+		if current_lvl > level_count then
+			-- Ends the game --
+			msg.post("main:/controller", "end")
+			
+		else
+			-- Checks if there 2 requirements --
+			if table_ctrl.get_lvl("2nd_requirement_type") == 0 then
+				-- Auto sets the 2nd requirement as completed -- 
+				lvl_completion[2] = true
+				-- Auto sets the 3rd requirement as completed -- 
+				lvl_completion[3] = true
+				
+				-- Checks if there 3 requirements --
+			elseif table_ctrl.get_lvl("3rd_requirement_type") == 0 then
+				-- Auto sets the 3rd requirement as completed -- 
+				lvl_completion[3] = true
+			end
+			
+			-- Updates GUI -- 
+			msg.post("main_game:/GUI", "update_level", {lvl = current_lvl})
+		end
+	elseif message_id == hash("Unlock") then
+		-- Checks if there is a crop unlock --
+		if not (table_ctrl.get_lvl("crop_unlock_type") == 0) then
+			-- Informs that a new crop is unlocked --
+			msg.post("main_game:/Selection", "Crop_unlocked", {crop_number = table_ctrl.get_lvl("crop_unlock_type")})
+		-- Checks if there is a food unlock --
+		elseif not (table_ctrl.get_lvl("food_unlock_type") == 0) then 
+			-- Informs that a new food is unlocked --
+			msg.post("main_game:/Selection", "Food_unlocked", {food_number = table_ctrl.get_lvl("food_unlock_type")})
+		end
+	elseif message_id == hash("update_day") then
+		-- Checks if the dealine has been reached --
+		if message.day_count == table_ctrl.get_lvl("level_deadline") then
+			-- Ends the game --
+			msg.post("main:/controller", "end")
+		end	
+	end
+end
+
+
+function on_input(self, action_id, action)
+	if action_id == hash("test") and action.pressed then
+		
+		msg.post("#", "New_level")
+	end
+end

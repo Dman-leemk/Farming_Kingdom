@@ -1,0 +1,138 @@
+
+function init(self)
+	local number_of_crops = 6
+	local number_of_food = 12
+
+	------------- Updates the GUI ---------------------------------------------------------------------------------
+	
+	-- Iterates through every crop --
+	for crop = 1, number_of_crops do
+
+		-- Looks if any crops are unlocked --
+		if crop_states["unlocked"][crop] == true then
+			-- Looks if any crops are bought --
+			if crop_states["bought"][crop] == true then
+				-- Shows the user the crop is unlocked
+				msg.post("main_game:/GUI_selection_boxes", "unlock_crop", {crop_type = crop})
+			else
+
+				-- Shows the user the crop needs to be bought + cost -- 
+				msg.post("main_game:/GUI_selection_boxes", "set_pay_form_crop", {crop_type = crop, crop_table = crop_states["unlock_cost"]})
+			end
+		end
+	end
+	
+	-- Iterates through every crop --
+	for food = 1, number_of_food do
+		-- Looks if any crops are unlocked --
+		if food_states["unlocked"][food] == true then
+			-- Looks if any crops are bought --
+			if food_states["bought"][food] == true then
+				-- Shows the user the crop is unlocked
+				msg.post("main_game:/GUI_selection_boxes", "unlock_food", {food_type = food})
+			else
+				-- Shows the user the food needs to be bought + cost -- 
+				msg.post("main_game:/GUI_selection_boxes", "set_pay_form_food", {food_type = food, food_table = food_states["unlock_cost"]})
+			end
+		end
+	end
+	
+	msg.post("main_game:/GUI_selection_boxes", "select_crop", {crop_type = current_crop})
+	msg.post("main_game:/GUI_selection_boxes", "select_food", {food_type = current_food, food_table = food_info})
+	--------------------------------------------------------------------------------------------------------------
+end
+
+function on_message(self, message_id, message, sender)
+	
+	if message_id == hash("Crop_box_clicked") then
+		
+		clicked_crop = message.crop_number -- Stores the type of clicked crop 
+		
+		-- Checks if the selected crop has been unlocked --
+		if crop_states["unlocked"][clicked_crop] == true then
+			
+			-- Checks if the crop was purchased --
+			if crop_states["bought"][clicked_crop] == true then
+				-- Checks if different buttons were clicked --
+				if not (current_crop == clicked_crop) then
+					------------------------------- Updates the GUI --------------------------------------
+					-- Selects the crop --
+					msg.post("main_game:/GUI_selection_boxes", "select_crop", {crop_type = clicked_crop})
+					-- Unselects the crop --
+					msg.post("main_game:/GUI_selection_boxes", "unlock_crop", {crop_type = current_crop})
+					current_crop = clicked_crop -- Updates the currently stored crop
+					-- Updates the displayed crop stored --
+					msg.post("main_game:/GUI", "update_crop", {crops = crop_info["number"][current_crop], storage = max_storage})
+					--------------------------------------------------------------------------------------
+					
+				end
+			else
+				cost = math.ceil(crop_states["unlock_cost"][clicked_crop] * evt_cost_mod)
+				-- Checks if enough money is avaliable to purchase the crop --
+				if bank >= cost then
+					-- Sets the crop as bought --
+					crop_states["bought"][clicked_crop] = true
+					-- Changes the bank to reflect the changes --
+					bank = bank - cost
+					-- Updates the GUI to match the loss of money --
+					msg.post("main_game:/GUI", "update_bank", {bank = bank})
+					msg.post("main_game:/GUI_selection_boxes", "update_cash", 
+					{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
+					-- Updates the look to reflect being bought --
+					msg.post("main_game:/GUI_selection_boxes", "unlock_crop", {crop_type = clicked_crop})
+				end
+			end
+		end
+	elseif message_id == hash("Food_box_clicked") then
+		
+		clicked_food = message.food_number -- Stores the type of clicked food
+		-- Checks if the selected food has been unlocked --
+		if food_states["unlocked"][clicked_food] == true then
+			-- Checks if the crop was purchased --
+			if food_states["bought"][clicked_food] == true then
+				-- Checks if different buttons were clicked --
+				if not (current_food == clicked_food) then
+					completed_cook = 0 -- Resets the food completion 
+					------------------------------- Updates the GUI --------------------------------------------------------------
+					-- Resets the progress bar
+					msg.post("main_game:/GUI", "update_food_progress", {size = 0})
+					-- Selects the crop --
+					msg.post("main_game:/GUI_selection_boxes", "select_food", {food_type = clicked_food, food_table = food_info})
+					-- Unselects the crop --
+					msg.post("main_game:/GUI_selection_boxes", "unlock_food", {food_type = current_food})
+					current_food = clicked_food -- Updates the currently stored food
+					-- Updates the displayed food stored --
+					msg.post("main_game:/GUI", "update_food", {food = food_info["number"][current_food], storage = max_storage})
+					--------------------------------------------------------------------------------------------------------------
+					
+				end
+			else
+				cost = math.floor(food_states["unlock_cost"][clicked_food] * evt_cost_mod)
+				-- Checks if enough money is avaliable to purchase the food --
+				if bank >= cost then
+					-- Sets the food as bought --
+					food_states["bought"][clicked_food] = true
+					-- Changes the food to reflect the changes --
+					bank = bank - cost
+					-- Updates the GUI to match the loss of money --
+					msg.post("main_game:/GUI", "update_bank", {bank = bank})
+					msg.post("main_game:/GUI_selection_boxes", "update_cash", 
+					{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
+					-- Updates the look to reflect being bought --
+					msg.post("main_game:/GUI_selection_boxes", "unlock_food", {food_type = clicked_food})
+				end
+			end
+		end 
+	elseif message_id == hash("Crop_unlocked") then
+		-- Updates the unlocked crops --
+		crop_states["unlocked"][message.crop_number] = true
+		-- Updates GUI --
+		msg.post("main_game:/GUI_selection_boxes", "set_pay_form_crop", {crop_type = message.crop_number, crop_table = crop_states["unlock_cost"]})
+		
+	elseif message_id == hash("Food_unlocked") then
+		-- Updates the unlocked foods --
+		food_states["unlocked"][message.food_number] = true
+		-- Updates GUI --
+		msg.post("main_game:/GUI_selection_boxes", "set_pay_form_food", {food_type = message.food_number, food_table = food_states["unlock_cost"]})
+	end
+end

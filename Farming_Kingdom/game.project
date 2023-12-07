@@ -1,0 +1,13 @@
+[bootstrap]
+main_collection = /main/_Main/main.collectionc
+
+[display]
+width = 1140
+height = 640
+
+[android]
+input_method = HiddenInputField
+
+[project]
+title = Farming Kingdom
+

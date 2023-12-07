@@ -1,0 +1,188 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+end
+
+function final(self)
+	msg.post(".", "release_input_focus")
+end
+
+id_info = {} -- Used to store the ids of the nodes
+id_info["crop_box_id"]       = {"Wheat_box", "Carrot_box", "Sugar_box", "Stawberry_box", "Grape_box", "Cocoa_box"}
+
+id_info["crop_unlocked_id"]  = {"Wheat_box", "Carrot_box", "Sugar_box", "Stawberry_box", "Grape_box", "Cacao_box"}
+id_info["crop_selected_id"]  = {"Wheat_slt", "Carrot_slt", "Sugar_slt", "Stawberry_slt", "Grape_slt", "Cacao_slt"}
+id_info["crop_payment_id"]  = {"Wheat_cost", "Carrot_cost", "Sugar_cost", "Stawberry_cost", "Grape_cost", "Cocoa_cost"}
+
+id_info["food_box_id"]  = {"Bread_box", "Beer_box", "Sliced_carrots_box", "Carrot_bread_box", "Cake_box", "Carrot_cake_box", "Stawberry_jam_box", 
+"Stawberry_cake_box", "Grape_jam_box", "Smoothie_box", "Chocolate_box", "Chocolate_cake_box"}
+
+id_info["food_unlocked_id"]  = {"Bread_box", "Beer_box", "Sliced_carrot_box", "Carrot_bread_box", "Cake_box", "Carrot_cake_box", "Stawberry_jam_box", 
+                                "Stawberry_cake_box", "Grape_jam_box", "Smoothie_box", "Chocolate_box", "Chocolate_cake_box"}
+
+id_info["food_selected_id"]  = {"Bread_slt", "Beer_slt", "Sliced_carrot_slt", "Carrot_bread_slt", "Cake_slt", "Carrot_cake_slt", "Stawberry_jam_slt", 
+                                "Stawberry_cake_slt", "Grape_jam_slt", "Smoothie_slt", "Chocolate_slt", "Chocolate_cake_slt"}
+
+id_info["food_payment_id"]  = {"Bread_cost", "Beer_cost", "Sliced_carrots_cost", "Carrot_bread_cost", "Cake_cost", "Carrot_cake_cost", "Stawberry_jam_cost", 
+                                "Stawberry_cake_cost", "Grape_jam_cost", "Smoothie_cost", "Chocolate_cost", "Chocolate_cake_cost"}
+								
+local max_crops = 6
+local max_food = 12
+
+function on_message(self, message_id, message, sender)
+	
+	if message_id == hash("unlock_crop") then
+		-- Stores passed crop type --
+		crop = message.crop_type
+		-- Shows the user the unlocked crop -- 
+		gui.play_flipbook(gui.get_node(id_info["crop_box_id"][crop]), id_info["crop_unlocked_id"][crop])
+		-- Hides cost number --
+		gui.set_enabled(gui.get_node(id_info["crop_payment_id"][crop]), false)
+		
+	elseif message_id == hash("unlock_food") then
+		-- Stores passed food type --
+		food = message.food_type 
+		-- Shows the user the unlocked food -- 
+		gui.play_flipbook(gui.get_node(id_info["food_box_id"][food]), id_info["food_unlocked_id"][food])
+		-- Hides cost number --
+		gui.set_enabled(gui.get_node(id_info["food_payment_id"][food]), false)
+		
+	elseif message_id == hash("select_crop") then
+		-- Stores passed crop type -- 
+		crop = message.crop_type
+		-- Shows the user the selected crop --
+		gui.play_flipbook(gui.get_node(id_info["crop_box_id"][crop]), id_info["crop_selected_id"][crop])
+			
+	elseif message_id == hash("select_food") then
+		food_type = message.food_type
+		food_table = message.food_table
+
+		-- Shows the user the selected crop --
+		gui.play_flipbook(gui.get_node(id_info["food_box_id"][food_type]), id_info["food_selected_id"][food_type])
+		
+		-- Displays new requirements --------------------------------------------------------------------------------------- 
+		gui.set_text(gui.get_node("Req_1_qty"), food_table["1st_req_qty"][food_type])
+		gui.play_flipbook(gui.get_node("Req_1_type"), id_info["crop_box_id"][food_table["1st_req_type"][food_type]])
+		
+		-- Checks if a 2nd requirement is needed -- 
+		if food_table["2nd_req_type"][food_type] == 0 then
+			-- Disables the unrequired display nodes -- 
+			gui.set_enabled(gui.get_node("Req_2_type"), false)
+			gui.set_enabled(gui.get_node("Req_2_qty"), false)
+			gui.set_enabled(gui.get_node("Req_3_type"), false)
+			gui.set_enabled(gui.get_node("Req_3_qty"), false)
+		else
+			-- Enables the required display nodes -- 
+			gui.set_enabled(gui.get_node("Req_2_type"), true)
+			gui.set_enabled(gui.get_node("Req_2_qty"), true)
+
+			-- Sets the nodes to reflect the requirements --
+			gui.set_text(gui.get_node("Req_2_qty"), food_table["2nd_req_qty"][food_type])
+			gui.play_flipbook(gui.get_node("Req_2_type"), id_info["crop_box_id"][food_table["2nd_req_type"][food_type]])
+
+			-- Checks if a 3rd requirement is needed -- 
+			if food_table["3rd_req_type"][food_type] == 0 then
+				-- Disables the unrequired display nodes -- 
+				gui.set_enabled(gui.get_node("Req_3_type"), false)
+				gui.set_enabled(gui.get_node("Req_3_qty"), false)
+			else
+				-- Enables the required display nodes -- 
+				gui.set_enabled(gui.get_node("Req_3_type"), true)
+				gui.set_enabled(gui.get_node("Req_3_qty"), true)
+				
+				-- Sets the nodes to reflect the requirements --
+				gui.set_text(gui.get_node("Req_3_qty"), food_table["3rd_req_qty"][food_type])
+				gui.play_flipbook(gui.get_node("Req_3_type"), id_info["crop_box_id"][food_table["3rd_req_type"][food_type]])
+			end
+		end
+		----------------------------------------------------------------------------------------------------------------------
+	elseif message_id == hash("set_pay_form_crop") then
+		crop_table = message.crop_table
+		crop = message.crop_type
+		
+		-- Finds the id of the required text node -- 
+		node_id = gui.get_node(id_info["crop_payment_id"][crop])
+		
+		-- Shows the user the cost --------------------------------------------------- 
+		gui.play_flipbook(gui.get_node(id_info["crop_box_id"][crop]), "Payment_box2")
+		gui.set_text(node_id, crop_table[crop])
+		gui.set_enabled(node_id, true)
+		--------------------------------------------------------------------------------
+	elseif message_id == hash("set_pay_form_food") then
+		food_table = message.food_table
+		food = message.food_type
+		
+		-- Finds the id of the required text node -- 
+		node_id = gui.get_node(id_info["food_payment_id"][food])
+
+		-- Shows the user the cost --------------------------------------------------- 
+		gui.play_flipbook(gui.get_node(id_info["food_box_id"][food]), "Payment_box2")
+		gui.set_text(node_id, food_table[food])
+		gui.set_enabled(node_id, true)
+		--------------------------------------------------------------------------------
+	elseif message_id == hash("update_cash") then
+		-- Stores passed variables --
+		local crop_cost_info = message.crop_info
+		local food_cost_info = message.food_info
+		local modifer        = message.cost_mod
+		-- Iterates through every crop node --
+		for crop = 1, max_crops do
+			-- Calculates the cost of the crop node --
+			local current_crop_cost = crop_cost_info[crop] * modifer
+			-- Finds the crop node --
+			local current_crop_code = gui.get_node(id_info["crop_payment_id"][crop])
+			
+			-- Checks if the cost of a node is greater than the money a user has --
+			if current_crop_cost > message.bank then
+				-- Sets the colour of the text to red --
+				gui.set_color(current_crop_code, vmath.vector4(1, 0, 0, 1))
+			-- Otherwises the user must afford the unlock --
+			else
+				-- Sets the colour of the text to green --
+				gui.set_color(current_crop_code, vmath.vector4(0, 1, 0, 1))
+			end
+			-- Updates the cost --
+			gui.set_text(current_crop_code, current_crop_cost)
+		end
+		-- Iterates through every food node --
+		for food = 1, max_food do
+			-- Calculates the cost of the food node --
+			local current_food_cost = food_cost_info[food] * modifer
+			-- Finds the food node --
+			local current_food_code = gui.get_node(id_info["food_payment_id"][food])
+			
+			-- Checks if the cost of a node is greater than the money a user has --
+			if current_food_cost > message.bank then
+				-- Sets the colour of the text to red --
+				gui.set_color(current_food_code, vmath.vector4(1, 0, 0, 1))
+			-- Otherwises the user must afford the unlock --
+			else
+				-- Sets the colour of the text to green --
+				gui.set_color(current_food_code, vmath.vector4(0, 1, 0, 1))
+			end
+			-- Updates the cost --
+			gui.set_text(current_food_code, current_food_cost)
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	if action.pressed then
+		-- Repeats through every crop node--
+		for crop = 1, max_crops do
+			-- Finds if a crop node was clicked --
+			if gui.pick_node(gui.get_node(id_info["crop_box_id"][crop]), action.x, action.y) then
+				-- Triggers the selection script --
+				msg.post("main_game:/Selection#selection", "Crop_box_clicked",{crop_number = crop})
+			end
+		end
+		-- Repeats through every food node--
+		for food = 1, max_food do
+			
+			-- Finds if a crop node was clicked --
+			if gui.pick_node(gui.get_node(id_info["food_box_id"][food]), action.x, action.y) then
+				-- Triggers the selection script --
+				msg.post("main_game:/Selection#selection", "Food_box_clicked",{food_number = food})
+			end
+		end
+	end
+end

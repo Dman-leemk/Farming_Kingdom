@@ -1,0 +1,81 @@
+
+-------------------- Initialises all global variables ----------------------------------------------------------------
+
+---------------------- Day control global variables ------------------------------------------------------------------
+
+day_count      = 1   -- Stores the number of days played
+time_remaining = 0   -- Stores the time left until the next day
+max_day_count  = 151 -- Stores the max number of days
+clock_progress = 0   -- Stores the clock progress
+clock_display  = 0   -- Stores the displayed progress
+
+----------------------- Harvesting global variables ------------------------------------------------------------------
+
+completed_farm      = 0             -- Stores the achieved progress for a crop by the user
+completed_cook      = 0             -- Stores the achieved progress for a food by the user
+max_storage         = 10            -- Stores the max amount of a resource a user can hold
+current_crop        = 1             -- Stores the currently selected crop
+current_food        = 1             -- Stores the currently selected food
+
+                 -- Stores the data each relating to crops --
+crop_info           = {} 
+crop_info["number"]         = {0,0,0,0,0,0} 
+crop_info["completion_req"] = {100,150,200,250,300,350}
+                 -- Stores the data relating to foods -- 
+food_info = {} --              1  2  3  4  5  6  7  8  9  10  11 12
+food_info["number"]         = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0 }
+food_info["1st_req_type"]   = {1, 1, 2, 1, 1, 1, 3, 1, 3, 2,  3, 1 }
+food_info["1st_req_qty"]    = {3, 5, 4, 5, 4, 4, 6, 4, 6, 5,  5, 5 }
+food_info["2nd_req_type"]   = {0, 0, 0, 2, 3, 2, 4, 3, 5, 4,  6, 4 }
+food_info["2nd_req_qty"]    = {0, 0, 0, 3, 2, 3, 6, 2, 6, 6,  3, 6 }
+food_info["3rd_req_type"]   = {0, 0, 0, 0, 0, 3, 0, 4, 0, 5,  0, 5 }
+food_info["3rd_req_qty"]    = {0, 0, 0, 0, 0, 2, 0, 4, 0, 10, 0, 10}
+food_info["completion_req"] = {100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650}
+food_info["value"]          = {10 , 25 , 40 , 60 , 100, 150, 200, 260, 330, 400, 500, 1000}
+
+----------------------- Selling global variables --------------------------------------------------------------------
+
+selling_amount = 1    -- Stores the number of crops sold at once             
+bank           = 1000 -- Stores the money the user has
+tax_percent    = 0.7  -- Stores the percentage reduction of money
+
+----------------------- Selection global variables ------------------------------------------------------------------
+
+food_states = {}
+-- Stores whether a food is unlocked --
+food_states["unlocked"] = {true, false, false, false, false, false, false, false, false, false, false, false}  
+-- Stores whether a food is bought --
+food_states["bought"]   = {true, false, false, false, false, false, false, false, false, false, false, false} 
+-- Stores the money required to buy the food --
+food_states["unlock_cost"] = {0, 50, 100, 200, 500, 750, 1000, 1300, 1750, 2500, 3000, 5000} 
+
+crop_states = {}
+crop_states["unlocked"] = {true, false, false, false, false, false} -- Stores whether a crop is unlocked
+crop_states["bought"]   = {true, false, false, false, false, false} -- Stores whether a crop is bought
+crop_states["unlock_cost"] = {0, 25, 75, 100, 200, 500} -- Stores the money required to buy the crop
+
+------------------------- Events global variables --------------------------------------------------------------------
+
+math.randomseed(os.time()) -- Sets a unique random seed 
+number_of_events = 10 -- Stores the number of the different types of events
+event_storage = {0}
+
+-- Stores 150 events -- 
+for event = 2, (max_day_count - 1) do
+    -- Stores the randomly generated events into the table --
+    table.insert(event_storage, event, math.random(1,number_of_events))
+end
+
+evt_harvesting_mod = 1 -- Stores the modifer for the crop harvest per click from the event
+evt_cost_mod       = 1 -- Stores the modifer for the cost from the event
+evt_increase_mod   = 1 -- Stores the modifer for the harvest completion
+effect = ""
+
+------------------------- Levels global varibles ---------------------------------------------------------------------
+
+current_lvl = 1 -- Stores the level  
+
+-- Stores the completed requirements 
+lvl_completion = {false,true,true}
+
+-------------------------------------------------------------------------------------------------------------------------

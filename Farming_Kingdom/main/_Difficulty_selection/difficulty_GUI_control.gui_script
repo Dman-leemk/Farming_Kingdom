@@ -1,0 +1,96 @@
+
+function init(self)
+	current_difficulty = "" -- Stores the current difficulty selected
+	continue_node = gui.get_node("continue_btn") -- Stores the continue node id
+	msg.post(".", "acquire_input_focus") 
+end
+
+function final(self)
+	msg.post(".", "release_input_focus")
+end
+
+function on_input(self, action_id, action)
+	-- Checks if the GUI was clicked --
+	if action.pressed then
+		-- Checks if the Easy button was clicked -- 
+		if gui.pick_node(gui.get_node("easy_btn"), action.x, action.y) then
+			-- Sets the easy node to the selected version --
+			node = gui.get_node("easy_btn")
+			gui.play_flipbook(node, "E_select")
+			gui.play_flipbook(continue_node, "continue_a")
+			
+			-- Checks if the same node was clicked mutiple times --
+			if not (node == current_difficulty) then
+				-- Unselects the previous node --
+				unselect(current_difficulty)
+				current_difficulty = node
+			end
+		end
+		-- Checks if the Medium button was clicked -- 
+		if gui.pick_node(gui.get_node("medium_btn"), action.x, action.y) then
+			-- Sets the medium node to the selected version --
+			node = gui.get_node("medium_btn")
+			gui.play_flipbook(node, "M_select")
+			gui.play_flipbook(continue_node, "continue_a")
+			
+			-- Checks if the same node was clicked mutiple times --
+			if not (node == current_difficulty) then
+				-- Unselects the previous node --
+				unselect(current_difficulty)
+				current_difficulty = node
+			end
+			
+		end
+		-- Checks if the Hard button was clicked -- 
+		if gui.pick_node(gui.get_node("hard_btn"), action.x, action.y) then
+			-- Sets the hard node to the selected version --
+			node = gui.get_node("hard_btn")
+			gui.play_flipbook(node, "H_select")
+			gui.play_flipbook(continue_node, "continue_a")
+			
+			-- Checks if the same node was clicked mutiple times --
+			if not (node == current_difficulty) then
+				-- Unselects the previous node --
+				unselect(current_difficulty)
+				current_difficulty = node
+			end
+		end
+		-- Checks if the Brutal button was clicked -- -
+		if gui.pick_node(gui.get_node("brutal_btn"), action.x, action.y) then
+			-- Sets the brutal node to the selected version --
+			node = gui.get_node("brutal_btn")
+			gui.play_flipbook(node, "B_select")
+			gui.play_flipbook(continue_node, "continue_a")
+			
+			-- Checks if the same node was clicked mutiple times --
+			if not (node == current_difficulty) then
+				-- Unselects the previous node --
+				unselect(current_difficulty)
+				current_difficulty = node
+			end
+		end
+		if gui.pick_node(gui.get_node("continue_btn"), action.x, action.y) then
+			-- Checks if a difficulty was selected --
+			if not (current_difficulty == "") then
+				-- Sends the message to load the main game --
+				msg.post("main:/controller", "main")
+			end
+		end
+	end
+end
+
+function unselect(node)
+	-- Checks if the easy node was previously selected -- 
+	if node == gui.get_node("easy_btn") then
+		gui.play_flipbook(node, "easy_btn")
+	-- Checks if the medium node was previously selected -- 
+	elseif node == gui.get_node("medium_btn") then
+		gui.play_flipbook(node, "medium_btn")
+	-- Checks if the hard node was previously selected -- 
+	elseif node == gui.get_node("hard_btn") then
+		gui.play_flipbook(node, "hard_btn")
+	-- Checks if the brutal node was previously selected -- 
+	elseif node == gui.get_node("brutal_btn") then
+		gui.play_flipbook(node, "brutal_btn")
+	end
+end

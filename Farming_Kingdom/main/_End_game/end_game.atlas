@@ -1,0 +1,11 @@
+images {
+  image: "/graphics/Game_over_screen/game over.png"
+  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
+}
+images {
+  image: "/graphics/Game_over_screen/rtn_title_btn.png"
+  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
+}
+margin: 0
+extrude_borders: 2
+inner_padding: 0

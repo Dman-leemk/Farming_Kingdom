@@ -1,0 +1,16 @@
+key_trigger {
+  input: KEY_T
+  action: "test"
+}
+key_trigger {
+  input: KEY_3
+  action: "test_lvl"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "touch"
+}
+text_trigger {
+  input: TEXT
+  action: "text"
+}

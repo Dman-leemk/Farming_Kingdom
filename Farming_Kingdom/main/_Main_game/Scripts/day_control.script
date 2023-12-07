@@ -1,0 +1,38 @@
+
+local day_delay   = 10     -- Stores the time between days
+local clock_delay = 0.5      -- Stores the time between clock updates  
+
+local function new_day()
+	day_count = day_count + 1
+	-- Ends the game if 150 days past --
+	if day_count == max_day_count then
+		msg.post("main:/controller", "end")
+	end
+	-- Updates the elements that rely on the day_count --
+	msg.post(".", "update_day", {day_count = day_count})
+	msg.post("main_game:/GUI", "update_day", {day_count = day_count})
+end
+
+local function update_time()
+	-- Increases the clock progress by the time passed --
+	clock_progress = clock_progress + clock_delay
+	-- Checks if a day worth of time has passed --
+	if clock_progress >= day_delay then
+		-- Resets the time counting --
+		clock_progress = 0
+		-- Calls the function taking care of day updates --
+		new_day()
+	end
+	-- Calculates the amount of required fill to display the clock -- 
+	clock_display =  -1 * (clock_progress * (360 / day_delay))
+	-- Updates GUI --
+	msg.post("main_game:/GUI", "update_clock", {clock_fill = clock_display})
+end
+
+function init(self)
+	-- Sets the displayed day count --
+	msg.post("main_game:/GUI", "update_day", {day_count = day_count})
+	msg.post("main_game:/GUI", "update_clock", {clock_fill = clock_display})
+	-- Times the progression --
+	timer.delay(clock_delay, true, update_time)
+end

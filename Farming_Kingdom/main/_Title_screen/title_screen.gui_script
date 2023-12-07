@@ -1,0 +1,23 @@
+function init(self)
+	msg.post(".", "acquire_input_focus") 
+end
+
+function final(self)
+	msg.post(".", "release_input_focus")
+end
+
+function on_input(self, action_id, action)
+	
+	-- this checks if the Settings button was clicked -- 
+	if action.pressed and gui.pick_node(gui.get_node("Settings"), action.x, action.y) then
+		
+		-- this sends the message to load the settings menu --
+		msg.post("main:/controller", "setting")
+	end
+	-- this checks if the Game Start button was clicked --
+	if action.pressed and gui.pick_node(gui.get_node("Game_start"), action.x, action.y) then
+		
+		-- this sends the message to load the difficulty selection --
+		msg.post("main:/controller", "diff")
+	end
+end
