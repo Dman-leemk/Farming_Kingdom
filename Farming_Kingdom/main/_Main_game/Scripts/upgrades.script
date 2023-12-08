@@ -3,7 +3,7 @@ local max_upgrades  = 6
 local base_increase = 1.75 
 
 function on_message(self, message_id, message, sender)
-	if message.id == hash("Upgrade_click") then
+	if message_id == hash("Upgrade_click") then
 		-- Stores the passed information into local variables --
 		local current_upg = message.upgrade_type
 		-- Stores the number of the clicked upgrade --
@@ -14,7 +14,7 @@ function on_message(self, message_id, message, sender)
 			return
 		end
 		-- Calculates the cost of the upgrade --
-		local cost = upgrades_table["Base_cost"] * (base_increase ^ (current_upg_num - 1))
+		local cost = math.ceil(upgrades_table["Base_cost"][current_upg] * (base_increase ^ (current_upg_num - 1)))
 		-- Checks if the user can afford the upgrade --
 		if cost <= bank then
 			-- Takes away the cost from the bank --
