@@ -1,5 +1,5 @@
 function init(self)
-	msg.post("main_game:/GUI", "update_event", {event = event_storage[day_count], next_event = event_storage[day_count + 1],effect_display = effect})
+	msg.post("main_game:/GUI", "update_event", {event = event_storage[day_count], next_event = event_storage[day_count + 1],effect_display = evt_effect})
 end
 
 function on_message(self, message_id, message, sender)
@@ -16,24 +16,24 @@ function on_message(self, message_id, message, sender)
 		if     1  == current_event then
 			-- Drought event -------------------------------------------------------------------------------
 			evt_harvesting_mod = 0.5
-			effect = "0.5x Progress per Click"
+			evt_effect = "0.5x Progress per Click"
 			------------------------------------------------------------------------------------------------
 		elseif 2  == current_event then
 			-- Rainy season event --------------------------------------------------------------------------
 			evt_harvesting_mod = 2
-			effect = "2x Progress per Click"
+			evt_effect = "2x Progress per Click"
 			------------------------------------------------------------------------------------------------
 		elseif 3  == current_event then
 			-- Black friday event --------------------------------------------------------------------------
 			evt_cost_mod = 0.5
-			effect = "-50% to costs"
+			evt_effect = "-50% to costs"
 			msg.post("main_game:/GUI_selection_boxes", "update_cash", 
 			{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
 			------------------------------------------------------------------------------------------------
 		elseif 4  == current_event then
 			-- Inflation event -----------------------------------------------------------------------------
 			evt_cost_mod = 2
-			effect = "+100% to costs"
+			evt_effect = "+100% to costs"
 			msg.post("main_game:/GUI_selection_boxes", "update_cash", 
 			{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
 			------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ function on_message(self, message_id, message, sender)
 			-- Inheritance event ---------------------------------------------------------------------------
 			local inherited_amt = 100
 			bank = bank + inherited_amt
-			effect = "+ $100"
+			evt_effect = "+ $100"
 			msg.post("main_game:/GUI", "update_bank", {bank = bank})
 			msg.post("main_game:/GUI_selection_boxes", "update_cash", 
 			{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
@@ -51,7 +51,7 @@ function on_message(self, message_id, message, sender)
 			bank_before = bank
 			bank = bank_before * tax_percent
 			bank_change = bank_before - bank
-			effect = "- " .. "$" .. bank_change
+			evt_effect = "- " .. "$" .. bank_change
 			msg.post("main_game:/GUI", "update_bank", {bank = bank})
 			msg.post("main_game:/GUI_selection_boxes", "update_cash", 
 			{crop_info = crop_states["unlock_cost"], food_info = food_states["unlock_cost"], bank = bank, cost_mod = evt_cost_mod})
@@ -76,7 +76,7 @@ function on_message(self, message_id, message, sender)
 			food_change = food_before - food_info["number"][chosen_food]
 			local food_names = {"Bread","Beer","Sliced Carrots","Carrot Bread","Cake","Carrot Cake","Stawberry Jam","Stawberry Cake","Grape Jam",
 			"Smoothie", "Chocolate","Chocolate Cake"}
-			effect = "-" .. food_change .. " " .. food_names[chosen_food]
+			evt_effect = "-" .. food_change .. " " .. food_names[chosen_food]
 			msg.post("main_game:/GUI", "update_food", {food = food_info["number"][current_food], storage = max_storage})
 			------------------------------------------------------------------------------------------------
 		elseif 8 == current_event then
@@ -91,7 +91,7 @@ function on_message(self, message_id, message, sender)
 				food_info["number"][chosen_food] = food_info["number"][chosen_food] + free_addition
 				local food_names = {"Bread","Beer","Sliced Carrots","Carrot Bread","Cake","Carrot Cake","Stawberry Jam","Stawberry Cake","Grape Jam",
 				"Smoothie", "Chocolate","Chocolate Cake"}
-				effect = "+5 " .. food_names[chosen_food]
+				evt_effect = "+5 " .. food_names[chosen_food]
 				msg.post("main_game:/GUI", "update_food", {food = food_info["number"][current_food], storage = max_storage})
 			-- Must be 2 --
 			else
@@ -100,21 +100,21 @@ function on_message(self, message_id, message, sender)
 				-- Increases the stored number by the addition amount --
 				crop_info["number"][chosen_crop] = crop_info["number"][chosen_crop] + free_addition
 				local crop_names = {"Wheat", "Carrot", "Sugar", "Stawberry", "Grape", "Cacao"}
-				effect = "+5 " .. crop_names[chosen_crop]
+				evt_effect = "+5 " .. crop_names[chosen_crop]
 				msg.post("main_game:/GUI", "update_crop", {crops = crop_info["number"][current_crop], storage = max_storage})
 			end 
 			------------------------------------------------------------------------------------------------
 		elseif 9  == current_event then
 			-- Bad harvest event ---------------------------------------------------------------------------
 			evt_increase_mod = 0.5
-			effect = "0.5x Crop per Harvest"
+			evt_effect = "0.5x Crop per Harvest"
 			------------------------------------------------------------------------------------------------
 		elseif 10 == current_event then
 			-- Plentiful harvest event ---------------------------------------------------------------------
 			evt_increase_mod = 2
-			effect = "2x Crop per Harvest"
+			evt_effect = "2x Crop per Harvest"
 			------------------------------------------------------------------------------------------------
 		end
-		msg.post("main_game:/GUI", "update_event", {event = current_event, next_event = event_storage[day + 1],effect_display = effect})
+		msg.post("main_game:/GUI", "update_event", {event = current_event, next_event = event_storage[day + 1],effect_display = evt_effect})
 	end
 end

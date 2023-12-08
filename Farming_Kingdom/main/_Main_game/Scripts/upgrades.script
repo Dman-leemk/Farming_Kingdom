@@ -1,51 +1,56 @@
-function init(self)
-	-- Add initialization code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
-end
 
-function final(self)
-	-- Add finalization code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
-end
-
-function update(self, dt)
-	-- Add update code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
-end
-
-function fixed_update(self, dt)
-	-- This function is called if 'Fixed Update Frequency' is enabled in the Engine section of game.project
-	-- Can be coupled with fixed updates of the physics simulation if 'Use Fixed Timestep' is enabled in
-	-- Physics section of game.project
-	-- Add update code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
-end
+local max_upgrades  = 6
+local base_increase = 1.75 
 
 function on_message(self, message_id, message, sender)
-	if message.id == hash("upgrade_clicked") then
-		if message.upgrade_clicked == "" then
+	if message.id == hash("Upgrade_click") then
+		-- Stores the passed information into local variables --
+		local current_upg = message.upgrade_type
+		-- Stores the number of the clicked upgrade --
+		local current_upg_num = upgrades_table["Number_of_upgrades"][current_upg]
 		
+		-- Ends the function if the max upgrades are reached -- 
+		if current_upg_num == max_upgrades then
+			return
+		end
+		-- Calculates the cost of the upgrade --
+		local cost = upgrades_table["Base_cost"] * (base_increase ^ (current_upg_num - 1))
+		-- Checks if the user can afford the upgrade --
+		if cost <= bank then
+			-- Takes away the cost from the bank --
+			bank = bank - cost
+			-- Increments the stored number of upgrades --
+			upgrades_table["Number_of_upgrades"][current_upg] = current_upg_num + 1
+		end
 	end
 end
 
-function on_input(self, action_id, action)
-	-- Add input-handling code here. The game object this script is attached to
-	-- must have acquired input focus:
-	--
-	--    msg.post(".", "acquire_input_focus")
-	--
-	-- All mapped input bindings will be received. Mouse and touch input will
-	-- be received regardless of where on the screen it happened.
-	-- Learn more: https://defold.com/manuals/input/
-	-- Remove this function if not needed
+local function apply_upg_eff (current_upg, upgrade_number)
+	-- Finds the corresponding click --
+	if     current_upg == 1 then
+		-- Tax evasion -- 
+		
+	elseif current_upg == 2 then
+		-- Farm automation --
+		upg_auto_farm = upgrade_number * 5
+		
+	elseif current_upg == 3 then
+		-- Storage --
+		upg_storage = upgrade_number * 10
+		
+	elseif current_upg == 4 then
+		-- Auto cooking --
+		upg_auto_cook = upgrade_number * 5
+		
+	elseif current_upg == 5 then
+		-- Larger fields --
+
+	elseif current_upg == 6 then
+		-- Better fertilizer --
+
+	end
 end
 
-function on_reload(self)
-	-- Add reload-handling code here
-	-- Learn more: https://defold.com/manuals/hot-reload/
-	-- Remove this function if not needed
-end
+-- Max upgrades
+-- Cost per upgrade
+-- 

@@ -69,13 +69,29 @@ end
 evt_harvesting_mod = 1 -- Stores the modifer for the crop harvest per click from the event
 evt_cost_mod       = 1 -- Stores the modifer for the cost from the event
 evt_increase_mod   = 1 -- Stores the modifer for the harvest completion
-effect = ""
+evt_effect = ""        -- Stores the displayed modifer
 
-------------------------- Levels global varibles ---------------------------------------------------------------------
+------------------------- Levels global variables ---------------------------------------------------------------------
 
 current_lvl = 1 -- Stores the level  
 
 -- Stores the completed requirements 
 lvl_completion = {false,true,true}
 
--------------------------------------------------------------------------------------------------------------------------
+------------------------- Upgrade global variables ---------------------------------------------------------------------
+
+upg_auto_farm  = 0 -- Stores the amount of harvest completion automatically completed
+upg_auto_cook  = 0 -- Stores the amount of cook completion automatically completed
+upg_farm_comp  = 0 -- Stores the increased completion harvesting
+upg_storage    = 0 -- Stores the increased storage due to upgrades
+upg_farm_prod  = 0 -- Stores the increased crop per harvest
+upg_tax_reduct = 0 -- Stores the decrease in the tax percentage 
+
+upgrades_table = {}
+
+upgrades_table["Number_of_upgrades"] = {0,0,0,0,0,0,0}
+upgrades_table["Base_cost"]          = {100,100,100,100,100,100,100}
+
+--------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------   
