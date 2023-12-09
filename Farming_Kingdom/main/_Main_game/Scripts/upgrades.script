@@ -1,7 +1,15 @@
 
 local max_upgrades  = 6
 local base_increase = 1.75 
+local num_of_upgrades = 6
 
+function init(self)
+	
+	for upgrade = 1, num_of_upgrades do
+
+		msg.post("main_game:/GUI", "update_upgrade", {current_upgrade = upgrade, current_upgrade_num = upgrades_table["Number_of_upgrades"][upgrade]})
+	end
+end	
 function on_message(self, message_id, message, sender)
 	if message_id == hash("Upgrade_click") then
 		-- Stores the passed information into local variables --
@@ -14,13 +22,19 @@ function on_message(self, message_id, message, sender)
 			return
 		end
 		-- Calculates the cost of the upgrade --
-		local cost = math.ceil(upgrades_table["Base_cost"][current_upg] * (base_increase ^ (current_upg_num - 1)))
+		local cost = math.ceil(upgrades_table["Base_cost"][current_upg] * (base_increase ^ (current_upg_num)))
 		-- Checks if the user can afford the upgrade --
 		if cost <= bank then
 			-- Takes away the cost from the bank --
 			bank = bank - cost
 			-- Increments the stored number of upgrades --
-			upgrades_table["Number_of_upgrades"][current_upg] = current_upg_num + 1
+			new_upg_num = current_upg_num + 1
+			-- Stores the change globally --
+			upgrades_table["Number_of_upgrades"][current_upg] = new_upg_num
+			
+			-- Updates GUI --
+			msg.post("main_game:/GUI", "update_upgrade", {current_upgrade = current_upg, current_upgrade_num = new_upg_num})
+			msg.post("main_game:/GUI", "update_bank", {bank = bank})
 		end
 	end
 end
@@ -29,6 +43,7 @@ local function apply_upg_eff (current_upg, upgrade_number)
 	-- Finds the corresponding click --
 	if     current_upg == 1 then
 		-- Tax evasion -- 
+		upg_tax_reduct = upgrade_number * 0,1
 		
 	elseif current_upg == 2 then
 		-- Farm automation --
@@ -44,13 +59,10 @@ local function apply_upg_eff (current_upg, upgrade_number)
 		
 	elseif current_upg == 5 then
 		-- Larger fields --
-
+		upg_farm_prod = upgrade_number + 1
+		
 	elseif current_upg == 6 then
 		-- Better fertilizer --
-
+		upg_farm_comp = upgrade_number * 15
 	end
 end
-
--- Max upgrades
--- Cost per upgrade
--- 
