@@ -2459,7 +2459,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "<text>"
   font: "system_font"
-  id: "Upgrade_effect"
+  id: "Upgrade_effect1"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -2652,7 +2652,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "<text>"
   font: "system_font"
-  id: "Upgrade_effect1"
+  id: "Upgrade_effect2"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -2845,7 +2845,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "<text>"
   font: "system_font"
-  id: "Upgrade_effect2"
+  id: "Upgrade_effect3"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -3038,7 +3038,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "<text>"
   font: "system_font"
-  id: "Upgrade_effect3"
+  id: "Upgrade_effect4"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -3231,7 +3231,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "<text>"
   font: "system_font"
-  id: "Upgrade_effect4"
+  id: "Upgrade_effect5"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -3424,7 +3424,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "<text>"
   font: "system_font"
-  id: "Upgrade_effect5"
+  id: "Upgrade_effect6"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER

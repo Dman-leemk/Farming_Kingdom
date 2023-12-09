@@ -36,7 +36,7 @@ food_info["value"]          = {10 , 25 , 40 , 60 , 100, 150, 200, 260, 330, 400,
 ----------------------- Selling global variables --------------------------------------------------------------------
 
 selling_amount = 1    -- Stores the number of crops sold at once             
-bank           = 1000 -- Stores the money the user has
+bank           = 10000 -- Stores the money the user has
 tax_percent    = 0.7  -- Stores the percentage reduction of money
 
 ----------------------- Selection global variables ------------------------------------------------------------------
@@ -91,7 +91,7 @@ upgrades_table = {}
 
 upgrades_table["Number_of_upgrades"] = {0,0,0,0,0,0,0}
 upgrades_table["Base_cost"]          = {100,100,100,100,100,100,100}
-
+upg_effects = {}
 --------------------------------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------------------------------   

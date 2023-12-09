@@ -4,38 +4,88 @@ local base_increase = 1.75
 local num_of_upgrades = 6
 
 local function apply_upg_eff (current_upg, upgrade_number)
+	
+	local next_upgrade_num = upgrade_number + 1
 	-- Finds the corresponding click --
 	if     current_upg == 1 then
 		-- Tax evasion -- 
-		upg_tax_reduct = upgrade_number * 0,1
-
+		upg_tax_reduct = upgrade_number * 0.1
+		
+		if upgrade_number == max_upgrades then
+			
+			upg_effects[current_upg] = "Max"
+		else
+			upg_effects[current_upg] = "From -" .. ((tax_percent - upg_tax_reduct) * 100) .. "% --> -" .. ((tax_percent - (next_upgrade_num * 0.1)) * 100) .. "%"
+		end
+		
 	elseif current_upg == 2 then
 		-- Farm automation --
 		upg_auto_farm = upgrade_number * 5
-
+		
+		if upgrade_number == max_upgrades then
+		
+			upg_effects[current_upg] = "Max"
+		else
+			upg_effects[current_upg] = "From +" .. upg_auto_farm .. " /s --> +" .. (next_upgrade_num * 5) .. "/s"
+		end
+		
 	elseif current_upg == 3 then
 		-- Storage --
 		upg_storage = upgrade_number * 10
-
+		
+		if upgrade_number == max_upgrades then
+		
+			upg_effects[current_upg] = "Max"
+		else
+			upg_effects[current_upg] = "From +" .. upg_storage .. " --> +" .. (next_upgrade_num * 10)
+		end
+		
 	elseif current_upg == 4 then
 		-- Auto cooking --
 		upg_auto_cook = upgrade_number * 5
-
+		
+		if upgrade_number == max_upgrades then
+		
+			upg_effects[current_upg] = "Max"
+		else
+			upg_effects[current_upg] = "From +" .. upg_auto_cook .. " /s --> +" .. ((next_upgrade_num * 5) .. "/s")
+		end
+		
 	elseif current_upg == 5 then
 		-- Larger fields --
 		upg_farm_prod = upgrade_number + 1
-
+		
+		if upgrade_number == max_upgrades then
+			
+			upg_effects[current_upg] = "Max"
+		else
+			upg_effects[current_upg] = "From +" .. upg_farm_prod .. " --> +" .. (next_upgrade_num + 1)
+		end
+		
 	elseif current_upg == 6 then
 		-- Better fertilizer --
 		upg_farm_comp = upgrade_number * 15
+		
+		if upgrade_number == max_upgrades then
+
+			upg_effects[current_upg] = "Max"
+		else
+			upg_effects[current_upg] = "From +" .. upg_farm_comp .. " --> +" .. (next_upgrade_num * 15)
+		end
 	end
+	msg.post("main_game:/GUI", "update_upgrade_eff", {current_upgrade = current_upg, current_upgrade_eff = upg_effects[current_upg]})
 end
 
 function init(self)
-	
+	if table.maxn(upg_effects) == 0 then
+		for upgrade = 1, max_upgrades do
+			apply_upg_eff(upgrade, 0)
+		end
+	end
 	for upgrade = 1, num_of_upgrades do
 
-		msg.post("main_game:/GUI", "update_upgrade", {current_upgrade = upgrade, current_upgrade_num = upgrades_table["Number_of_upgrades"][upgrade]})
+		msg.post("main_game:/GUI", "update_upgrade_num", {current_upgrade = upgrade, current_upgrade_num = upgrades_table["Number_of_upgrades"][upgrade]})
+		msg.post("main_game:/GUI", "update_upgrade_eff", {current_upgrade = upgrade, current_upgrade_eff = upg_effects[upgrade]})
 	end
 end	
 function on_message(self, message_id, message, sender)
@@ -62,7 +112,7 @@ function on_message(self, message_id, message, sender)
 			-- Applies changed modifer --
 			apply_upg_eff(current_upg,new_upg_num)
 			-- Updates GUI --
-			msg.post("main_game:/GUI", "update_upgrade", {current_upgrade = current_upg, current_upgrade_num = new_upg_num})
+			msg.post("main_game:/GUI", "update_upgrade_num", {current_upgrade = current_upg, current_upgrade_num = new_upg_num})
 			msg.post("main_game:/GUI", "update_bank", {bank = bank})
 		end
 	end
