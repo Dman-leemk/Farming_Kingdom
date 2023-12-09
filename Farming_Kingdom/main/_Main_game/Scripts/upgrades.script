@@ -3,6 +3,34 @@ local max_upgrades  = 6
 local base_increase = 1.75 
 local num_of_upgrades = 6
 
+local function apply_upg_eff (current_upg, upgrade_number)
+	-- Finds the corresponding click --
+	if     current_upg == 1 then
+		-- Tax evasion -- 
+		upg_tax_reduct = upgrade_number * 0,1
+
+	elseif current_upg == 2 then
+		-- Farm automation --
+		upg_auto_farm = upgrade_number * 5
+
+	elseif current_upg == 3 then
+		-- Storage --
+		upg_storage = upgrade_number * 10
+
+	elseif current_upg == 4 then
+		-- Auto cooking --
+		upg_auto_cook = upgrade_number * 5
+
+	elseif current_upg == 5 then
+		-- Larger fields --
+		upg_farm_prod = upgrade_number + 1
+
+	elseif current_upg == 6 then
+		-- Better fertilizer --
+		upg_farm_comp = upgrade_number * 15
+	end
+end
+
 function init(self)
 	
 	for upgrade = 1, num_of_upgrades do
@@ -31,7 +59,8 @@ function on_message(self, message_id, message, sender)
 			new_upg_num = current_upg_num + 1
 			-- Stores the change globally --
 			upgrades_table["Number_of_upgrades"][current_upg] = new_upg_num
-			
+			-- Applies changed modifer --
+			apply_upg_eff(current_upg,new_upg_num)
 			-- Updates GUI --
 			msg.post("main_game:/GUI", "update_upgrade", {current_upgrade = current_upg, current_upgrade_num = new_upg_num})
 			msg.post("main_game:/GUI", "update_bank", {bank = bank})
@@ -39,30 +68,3 @@ function on_message(self, message_id, message, sender)
 	end
 end
 
-local function apply_upg_eff (current_upg, upgrade_number)
-	-- Finds the corresponding click --
-	if     current_upg == 1 then
-		-- Tax evasion -- 
-		upg_tax_reduct = upgrade_number * 0,1
-		
-	elseif current_upg == 2 then
-		-- Farm automation --
-		upg_auto_farm = upgrade_number * 5
-		
-	elseif current_upg == 3 then
-		-- Storage --
-		upg_storage = upgrade_number * 10
-		
-	elseif current_upg == 4 then
-		-- Auto cooking --
-		upg_auto_cook = upgrade_number * 5
-		
-	elseif current_upg == 5 then
-		-- Larger fields --
-		upg_farm_prod = upgrade_number + 1
-		
-	elseif current_upg == 6 then
-		-- Better fertilizer --
-		upg_farm_comp = upgrade_number * 15
-	end
-end
